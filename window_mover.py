@@ -55,10 +55,9 @@ def move_focused_window_to_position(x, y):
         move_window(hwnd, x, y)
         window_title = win32gui.GetWindowText(hwnd)
         print(Fore.GREEN + f"Moved window '{window_title}' to ({x}, {y}).")
+        clear_menu_after_delay()
     else:
         print(Fore.RED + "No window is currently in focus.")
-    time.sleep(1)
-    clear_and_print_menu()
 
 
 def adjust_window_position(dx, dy):
@@ -110,6 +109,15 @@ def stop_moving(key):
     """Stops the background thread for continuous movement."""
     global running_threads
     running_threads[key] = False
+
+
+def clear_menu_after_delay():
+    """Clears and reprints the menu after a short delay in a separate thread."""
+    def delayed_clear():
+        time.sleep(5)
+        clear_and_print_menu()
+
+    Thread(target=delayed_clear, daemon=True).start()
 
 
 def quit_program():

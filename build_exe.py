@@ -7,7 +7,8 @@ def build_exe():
     try:
         # Run the pyinstaller command with --noconsole and --distpath options
         subprocess.run(
-            ["pyinstaller", "--onefile", "--noconsole", "--distpath", current_dir, "window_mover.py"],
+            #["pyinstaller", "--onefile", "--noconsole", "--distpath", current_dir, "window_mover.py"],
+            ["pyinstaller", "--onefile", "--distpath", current_dir, "window_mover.py"],
             check=True
         )
         print("Executable built successfully in:", current_dir)

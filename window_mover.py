@@ -3,6 +3,7 @@ import win32con
 import keyboard
 import time
 from threading import Thread
+import os
 
 # Define positions and options for each shortcut
 # Structure: {hotkey: (x, y, suppress)}
@@ -94,6 +95,11 @@ def stop_moving(key):
     if key in running_threads:
         running_threads[key] = False
 
+def quit_program():
+    """Stops the program gracefully."""
+    print("Exiting program...")
+    os._exit(0)  # Immediately terminates the process
+
 def main():
     print("Running in background:")
     print("Hotkeys:")
@@ -119,7 +125,7 @@ def main():
     keyboard.on_release_key("right", lambda _: stop_moving("right"))
 
     # Register hotkey to quit the script
-    keyboard.add_hotkey("ctrl+alt+q", lambda: exit(), suppress=True)
+    keyboard.add_hotkey("ctrl+alt+q", quit_program, suppress=True)
 
     # Keep the script running
     keyboard.wait()

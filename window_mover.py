@@ -28,21 +28,22 @@ MAX_SPEED_INCREMENT = 20  # Max pixels per step
 # State variable to track active key presses
 running_threads = {}
 
+
 def move_window(x, y):
     """Moves the currently focused window to (x, y)."""
     hwnd = win32gui.GetForegroundWindow()
     if hwnd:
-        win32gui.SetWindowPos(
-            hwnd, win32con.HWND_TOP, x, y, 0, 0, win32con.SWP_NOSIZE
-        )
+        win32gui.SetWindowPos(hwnd, win32con.HWND_TOP, x, y, 0, 0, win32con.SWP_NOSIZE)
     else:
         print("No window is currently in focus.")
+
 
 def move_focused_window_to_position(x, y):
     """Moves the focused window to the specified position."""
     global current_x, current_y
     current_x, current_y = x, y
     move_window(x, y)
+
 
 def adjust_window_position(dx, dy):
     """Adjusts the position of the focused window incrementally."""
@@ -62,6 +63,7 @@ def adjust_window_position(dx, dy):
     current_y += dy
     move_window(current_x, current_y)
 
+
 def continuous_adjustment(key, dx, dy):
     """Handles continuous movement with acceleration."""
     global running_threads
@@ -72,12 +74,13 @@ def continuous_adjustment(key, dx, dy):
     while key in running_threads and running_threads[key]:
         adjust_window_position(dx * increment, dy * increment)
         time.sleep(delay)
-        
+
         # Accelerate: Reduce delay and increase increment up to max
         if delay > MIN_DELAY:
             delay *= ACCELERATION
         if increment < MAX_SPEED_INCREMENT:
             increment += 1
+
 
 def start_moving(key, dx, dy):
     """Starts a background thread to handle continuous movement."""
@@ -89,34 +92,49 @@ def start_moving(key, dx, dy):
     thread = Thread(target=continuous_adjustment, args=(key, dx, dy), daemon=True)
     thread.start()
 
+
 def stop_moving(key):
     """Stops the background thread for continuous movement."""
     global running_threads
     if key in running_threads:
         running_threads[key] = False
 
+
 def quit_program():
     """Stops the program gracefully."""
     print("Exiting program...")
     os._exit(0)  # Immediately terminates the process
+
 
 def main():
     print("Running in background:")
     print("Hotkeys:")
     for hotkey, (x, y, suppress) in positions.items():
         print(f"  - {hotkey}: Move the window to ({x}, {y}), suppress = {suppress}")
-    print("- Hold Ctrl+Alt+\\ and use arrow keys to adjust the window position with increasing speed.")
+    print(
+        "- Hold Ctrl+Alt+\\ and use arrow keys to adjust the window position with increasing speed."
+    )
     print("- Press Ctrl+Alt+Q to quit.")
 
     # Register hotkeys for predefined positions
     for hotkey, (x, y, suppress) in positions.items():
-        keyboard.add_hotkey(hotkey, move_focused_window_to_position, args=(x, y), suppress=suppress)
+        keyboard.add_hotkey(
+            hotkey, move_focused_window_to_position, args=(x, y), suppress=suppress
+        )
 
     # Register arrow key adjustments while holding Ctrl+Alt+\
-    keyboard.add_hotkey("ctrl+alt+\\+up", start_moving, args=("up", 0, -1), suppress=True)
-    keyboard.add_hotkey("ctrl+alt+\\+down", start_moving, args=("down", 0, 1), suppress=True)
-    keyboard.add_hotkey("ctrl+alt+\\+left", start_moving, args=("left", -1, 0), suppress=True)
-    keyboard.add_hotkey("ctrl+alt+\\+right", start_moving, args=("right", 1, 0), suppress=True)
+    keyboard.add_hotkey(
+        "ctrl+alt+\\+up", start_moving, args=("up", 0, -1), suppress=True
+    )
+    keyboard.add_hotkey(
+        "ctrl+alt+\\+down", start_moving, args=("down", 0, 1), suppress=True
+    )
+    keyboard.add_hotkey(
+        "ctrl+alt+\\+left", start_moving, args=("left", -1, 0), suppress=True
+    )
+    keyboard.add_hotkey(
+        "ctrl+alt+\\+right", start_moving, args=("right", 1, 0), suppress=True
+    )
 
     # Stop movement when the key is released
     keyboard.on_release_key("up", lambda _: stop_moving("up"))
@@ -129,6 +147,7 @@ def main():
 
     # Keep the script running
     keyboard.wait()
+
 
 if __name__ == "__main__":
     main()

@@ -4,7 +4,7 @@ import keyboard
 import time
 from threading import Thread
 import os
-from colorama import Fore, Style, init
+from colorama import Fore, init
 from collections import defaultdict
 
 init(autoreset=True)  # Initialize colorama for cross-platform color support

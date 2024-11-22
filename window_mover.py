@@ -4,15 +4,19 @@ import keyboard
 import time
 from threading import Thread
 
-# Initial positions for shortcuts
+# Define positions and options for each shortcut
+# Structure: {hotkey: (x, y, suppress)}
+# - hotkey: The key combination to trigger the action.
+# - x, y: The target screen coordinates to move the window.
+# - suppress: If True, prevents the keypress from affecting the currently focused application.
 positions = {
-    "ctrl+alt+1": (-7, -30),
-    "ctrl+alt+2": (-7, 35),
-    "ctrl+alt+3": (100, 100),  # Example additional shortcut
+    "ctrl+alt+1": (-7, -30, True),
+    "ctrl+alt+2": (-7, 35, True),
+    "ctrl+alt+3": (100, 100, False),
 }
 
-# Stores the current position to allow incremental adjustments
-current_x, current_y = -7, -30
+# Initial position to track the current location of the window
+current_x, current_y = None, None
 
 # Max speed settings
 INITIAL_DELAY = 0.1  # Initial delay between moves (in seconds)
@@ -42,6 +46,16 @@ def move_focused_window_to_position(x, y):
 def adjust_window_position(dx, dy):
     """Adjusts the position of the focused window incrementally."""
     global current_x, current_y
+
+    if current_x is None or current_y is None:
+        # Get the current position of the focused window as the starting point
+        hwnd = win32gui.GetForegroundWindow()
+        if hwnd:
+            rect = win32gui.GetWindowRect(hwnd)
+            current_x, current_y = rect[0], rect[1]
+        else:
+            print("No window is currently in focus.")
+            return
 
     current_x += dx
     current_y += dy
@@ -83,20 +97,20 @@ def stop_moving(key):
 def main():
     print("Running in background:")
     print("Hotkeys:")
-    for hotkey, pos in positions.items():
-        print(f"  - {hotkey}: Move the window to {pos}")
+    for hotkey, (x, y, suppress) in positions.items():
+        print(f"  - {hotkey}: Move the window to ({x}, {y}), suppress = {suppress}")
     print("- Hold Ctrl+Alt+\\ and use arrow keys to adjust the window position with increasing speed.")
     print("- Press Ctrl+Alt+Q to quit.")
 
     # Register hotkeys for predefined positions
-    for hotkey, pos in positions.items():
-        keyboard.add_hotkey(hotkey, move_focused_window_to_position, args=pos)
+    for hotkey, (x, y, suppress) in positions.items():
+        keyboard.add_hotkey(hotkey, move_focused_window_to_position, args=(x, y), suppress=suppress)
 
     # Register arrow key adjustments while holding Ctrl+Alt+\
-    keyboard.add_hotkey("ctrl+alt+\\+up", start_moving, args=("up", 0, -1))
-    keyboard.add_hotkey("ctrl+alt+\\+down", start_moving, args=("down", 0, 1))
-    keyboard.add_hotkey("ctrl+alt+\\+left", start_moving, args=("left", -1, 0))
-    keyboard.add_hotkey("ctrl+alt+\\+right", start_moving, args=("right", 1, 0))
+    keyboard.add_hotkey("ctrl+alt+\\+up", start_moving, args=("up", 0, -1), suppress=True)
+    keyboard.add_hotkey("ctrl+alt+\\+down", start_moving, args=("down", 0, 1), suppress=True)
+    keyboard.add_hotkey("ctrl+alt+\\+left", start_moving, args=("left", -1, 0), suppress=True)
+    keyboard.add_hotkey("ctrl+alt+\\+right", start_moving, args=("right", 1, 0), suppress=True)
 
     # Stop movement when the key is released
     keyboard.on_release_key("up", lambda _: stop_moving("up"))
@@ -105,7 +119,7 @@ def main():
     keyboard.on_release_key("right", lambda _: stop_moving("right"))
 
     # Register hotkey to quit the script
-    keyboard.add_hotkey("ctrl+alt+q", lambda: exit())
+    keyboard.add_hotkey("ctrl+alt+q", lambda: exit(), suppress=True)
 
     # Keep the script running
     keyboard.wait()

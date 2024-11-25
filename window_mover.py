@@ -71,9 +71,39 @@ def move_focused_window_to_position(x, y):
         clear_menu_after_delay()
     else:
         print(Fore.RED + "No window is currently in focus.")
+        
+def register_hotkeys():
+    """Registers hotkeys from the current positions dictionary."""
+    # Unhook all hotkeys manually to avoid duplicates
+    keyboard.unhook_all()
+    
+    # Register hotkeys for predefined positions
+    for hotkey, (x, y) in positions.items():
+        keyboard.add_hotkey(hotkey, move_focused_window_to_position, args=(x, y))
+    
+    # Re-register dynamic saving of new hotkeys
+    for i in range(10):  # Numbers 0-9
+        keyboard.add_hotkey(f"ctrl+alt+s+{i}", save_hotkey_position, args=(i,))
+    
+    # Register arrow key adjustments while holding Ctrl+Alt+\
+    keyboard.add_hotkey("ctrl+alt+\\+up", start_moving, args=("up", 0, -1))
+    keyboard.add_hotkey("ctrl+alt+\\+down", start_moving, args=("down", 0, 1))
+    keyboard.add_hotkey("ctrl+alt+\\+left", start_moving, args=("left", -1, 0))
+    keyboard.add_hotkey("ctrl+alt+\\+right", start_moving, args=("right", 1, 0))
+    
+    # Re-register stop movement handlers for arrow keys
+    keyboard.on_release_key("up", lambda _: stop_moving("up"))
+    keyboard.on_release_key("down", lambda _: stop_moving("down"))
+    keyboard.on_release_key("left", lambda _: stop_moving("left"))
+    keyboard.on_release_key("right", lambda _: stop_moving("right"))
+    
+    # Register hotkey to quit the script
+    keyboard.add_hotkey("ctrl+alt+q", quit_program)
+
 
 def save_hotkey_position(number):
     """Saves the current window position as a new hotkey (Ctrl+Alt+Number)."""
+    global positions  # Ensure we're modifying the global positions dictionary
     hwnd = win32gui.GetForegroundWindow()
     if not hwnd:
         print(Fore.RED + "No window is currently in focus. Cannot save position.")
@@ -86,9 +116,15 @@ def save_hotkey_position(number):
     
     # Update positions and save
     positions[hotkey] = [x, y]
-    save_positions(positions)
-    print(Fore.GREEN + f"Saved hotkey '{hotkey}' with position ({x}, {y}).")
+    save_positions(positions)  # Save to file
+    positions = load_positions()  # Reload the positions from the updated file
+    
+    # Re-register all hotkeys
+    register_hotkeys()
+    print(Fore.GREEN + f"Saved hotkey '{hotkey}' with position ({x}, {y}) and updated hotkeys.")
     clear_menu_after_delay()
+
+
 
 def adjust_window_position(dx, dy):
     """Adjusts the position of the focused window incrementally."""
@@ -142,32 +178,9 @@ def quit_program():
 
 def main():
     clear_and_print_menu()
+    register_hotkeys()  # Register all hotkeys initially
+    keyboard.wait()  # Keep the script running
 
-    # Register hotkeys for predefined positions
-    for hotkey, (x, y) in positions.items():
-        keyboard.add_hotkey(hotkey, move_focused_window_to_position, args=(x, y))
-    
-    # Register dynamic saving of new hotkeys
-    for i in range(10):  # Numbers 0-9
-        keyboard.add_hotkey(f"ctrl+alt+s+{i}", save_hotkey_position, args=(i,))
-    
-    # Register arrow key adjustments while holding Ctrl+Alt+\
-    keyboard.add_hotkey("ctrl+alt+\\+up", start_moving, args=("up", 0, -1))
-    keyboard.add_hotkey("ctrl+alt+\\+down", start_moving, args=("down", 0, 1))
-    keyboard.add_hotkey("ctrl+alt+\\+left", start_moving, args=("left", -1, 0))
-    keyboard.add_hotkey("ctrl+alt+\\+right", start_moving, args=("right", 1, 0))
-    
-    # Stop movement when the key is released
-    keyboard.on_release_key("up", lambda _: stop_moving("up"))
-    keyboard.on_release_key("down", lambda _: stop_moving("down"))
-    keyboard.on_release_key("left", lambda _: stop_moving("left"))
-    keyboard.on_release_key("right", lambda _: stop_moving("right"))
-
-    # Register hotkey to quit the script
-    keyboard.add_hotkey("ctrl+alt+q", quit_program)
-
-    # Keep the script running
-    keyboard.wait()
 
 if __name__ == "__main__":
     main()

@@ -2,30 +2,45 @@ import subprocess
 import os
 import shutil
 
-def build_exe():
+def build_target(script_name, output_dir, no_console=False):
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    dist_path = os.path.join(current_dir, output_dir)
+
+    os.makedirs(dist_path, exist_ok=True)
+
+    base_cmd = [
+        "pyinstaller",
+        "--onefile",
+        "--distpath", dist_path,
+        script_name
+    ]
+    if no_console:
+        base_cmd.insert(1, "--noconsole")
+
     try:
-        # Run the pyinstaller command with --noconsole and --distpath options
-        subprocess.run(
-            #["pyinstaller", "--onefile", "--noconsole", "--distpath", current_dir, "window_mover.py"],
-            ["pyinstaller", "--onefile", "--distpath", current_dir, "window_mover.py"],
-            check=True
-        )
-        print("Executable built successfully in:", current_dir)
-        
-        # Remove the build directory
-        build_dir = os.path.join(current_dir, "build")
-        if os.path.exists(build_dir):
-            shutil.rmtree(build_dir)
-            print("Build folder deleted.")
-        
-        # Remove the .spec file
-        spec_file = os.path.join(current_dir, "window_mover.spec")
-        if os.path.exists(spec_file):
-            os.remove(spec_file)
-            print("Spec file deleted.")
+        print(f"Building: {script_name} (no_console={no_console})")
+        subprocess.run(base_cmd, check=True)
+        print(f"Executable for {script_name} built in: {dist_path}")
     except subprocess.CalledProcessError:
-        print("An error occurred during the build process.")
+        print(f"Error building {script_name}")
+        return
+
+def build_exe():
+    build_dir = "bin"
+    build_target("window_mover.py", build_dir, no_console=False)
+    build_target("gui.py", build_dir, no_console=True)
+
+    # Remove the intermediate build folder
+    intermediate_build = os.path.join(os.getcwd(), "build")
+    if os.path.exists(intermediate_build) and intermediate_build != os.path.abspath(build_dir):
+        shutil.rmtree(intermediate_build)
+        print("Intermediate build folder deleted.")
+
+    # Remove spec files
+    for spec in ["window_mover.spec", "gui.spec"]:
+        if os.path.exists(spec):
+            os.remove(spec)
+            print(f"Spec file {spec} deleted.")
 
 if __name__ == "__main__":
     build_exe()

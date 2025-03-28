@@ -77,6 +77,37 @@ Download the exe from the releases page.
    - Hold `Ctrl+Alt+\\` and use the arrow keys for precise movement.
 
 
+
+
+## **GUI Version (Optional)**
+
+If you prefer not to use the terminal, a dark-mode GUI version is also included!
+
+### **Features**
+- Shows currently focused window and its screen position
+- View, add, and remove all saved hotkey positions
+- Automatically refreshes when the active window changes or the config file is updated
+- Fully keyboard-free interface with built-in help
+- Clean, minimal dark theme
+
+### **Usage**
+1. Run `gui.exe` (from the build folder) or `python gui.py`
+2. The interface will open, showing your current focused window and saved hotkeys
+3. Use the "Remove Selected" or "Refresh" buttons as needed
+4. Hotkeys added via the console will sync automatically with the GUI (and vice versa)
+
+### 🔄 Building Both Versions
+
+Both versions can be built using:
+
+```bash
+python build_exe.py
+```
+
+This creates:
+- `build/window_mover.exe` (console version)
+- `build/gui.exe` (GUI version)
+
 ## **File Structure**
 - **`window_mover.py`**: The main script.
 - **`positions_config.json`**: The configuration file that stores all hotkeys and their corresponding positions.

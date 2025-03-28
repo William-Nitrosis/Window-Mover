@@ -6,37 +6,11 @@ from threading import Thread
 import os
 from colorama import Fore, init
 from collections import defaultdict
-import json
+from window_utils import load_positions, save_positions
 
 init(autoreset=True)  # Initialize colorama for cross-platform color support
 
 CONFIG_FILE = "positions_config.json"
-
-
-def load_positions():
-    """Loads positions from the configuration file."""
-    if not os.path.exists(CONFIG_FILE):
-        print(
-            Fore.RED
-            + f"Configuration file '{CONFIG_FILE}' not found. Creating a new one."
-        )
-        with open(CONFIG_FILE, "w") as f:
-            json.dump({}, f)
-        return {}
-    with open(CONFIG_FILE, "r") as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError as e:
-            print(Fore.RED + f"Error reading configuration file: {e}")
-            return {}
-
-
-def save_positions(positions):
-    """Saves the updated positions dictionary back to the configuration file."""
-    with open(CONFIG_FILE, "w") as f:
-        json.dump(positions, f, indent=4)
-    print(Fore.GREEN + f"Saved updated positions to '{CONFIG_FILE}'.")
-
 
 positions = load_positions()  # Load the positions from the file
 

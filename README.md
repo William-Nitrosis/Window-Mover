@@ -2,7 +2,6 @@
 
 **Window-Mover** is a lightweight tool for quickly positioning windows on your screen using keyboard shortcuts — with both a colorful console version and a modern dark-themed GUI.
 
----
 
 ## ✨ Features
 - Move focused windows with hotkeys (`Ctrl+Alt+<key>`)
@@ -13,7 +12,6 @@
 
 
 ## 📦 Requirements
-
 Install dependencies with:
 
 ```bash
@@ -28,7 +26,6 @@ pip install pycaw comtypes
 
 
 ## 🚀 Usage
-
 ### Console Mode
 ```bash
 python window_mover.py
@@ -47,7 +44,6 @@ python gui.py
 
 
 ## 🛠️ Build Executables
-
 To build both versions into `.exe` files:
 ```bash
 python build_exe.py
@@ -59,7 +55,6 @@ Outputs:
 
 
 ## 📝 Config
-
 Positions are saved in:
 ```json
 {

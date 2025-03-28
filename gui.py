@@ -1,7 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 import os
-import time
 from window_utils import (
     load_positions,
     save_positions,
@@ -20,7 +19,6 @@ class WindowManagerGUI:
 
         title_font = ("Segoe UI", 12, "bold")
         label_font = ("Segoe UI", 10)
-        bold_font = ("Segoe UI", 10, "bold")
 
         # --- DARK MODE ---
         dark_bg = "#2e2e2e"

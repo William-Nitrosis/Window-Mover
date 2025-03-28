@@ -11,7 +11,6 @@
 - GUI with live updates, dark mode, and click-to-manage interface
 - Configurable positions saved in `positions_config.json`
 
----
 
 ## 📦 Requirements
 
@@ -27,7 +26,6 @@ pip install keyboard pywin32 colorama
 pip install pycaw comtypes
 ```
 
----
 
 ## 🚀 Usage
 
@@ -47,7 +45,6 @@ python gui.py
 - Clean interface to view, add, and remove hotkey positions
 - Automatically refreshes on focus or config changes
 
----
 
 ## 🛠️ Build Executables
 
@@ -60,7 +57,6 @@ Outputs:
 - `build/window_mover.exe` – console version
 - `build/gui.exe` – GUI version
 
----
 
 ## 📝 Config
 
@@ -74,6 +70,5 @@ Positions are saved in:
 
 You can edit `positions_config.json` manually or use the GUI.
 
----
 
 ## 🪟 Enjoy faster, cleaner window control!
